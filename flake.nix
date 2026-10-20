@@ -4,6 +4,12 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
+    # Only update-workflows reads this input: it names the revision whose workflow templates this repository tracks.
+    flake-lib = {
+      url = "github:jgus-org/flake-lib/v1";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,6 +21,7 @@
       self,
       nixpkgs,
       flake-utils,
+      flake-lib,
       treefmt-nix,
     }:
     flake-utils.lib.eachDefaultSystem (
