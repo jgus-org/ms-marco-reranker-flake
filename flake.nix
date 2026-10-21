@@ -3,12 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    flake-utils.url = "github:numtide/flake-utils";
-    # Only update-workflows reads this input: it names the revision whose workflow templates this repository tracks.
     flake-lib = {
       url = "github:jgus-org/flake-lib/v1";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -20,11 +17,10 @@
     {
       self,
       nixpkgs,
-      flake-utils,
       flake-lib,
       treefmt-nix,
     }:
-    flake-utils.lib.eachDefaultSystem (
+    flake-lib.lib.eachDefaultSystem (
       system:
       let
         pin = import ./pin.nix;
@@ -55,7 +51,7 @@
           )
         );
 
-        # Bespoke (not flake-lib's mkUpdateVersion): the source is a HuggingFace model repo (commit + per-file hash table), which flake-lib has no strategy for.
+        # Bespoke rather than flake-lib's mkUpdateVersion: its huggingface source writes { version, sourceRev, hashes }, and this pin is { rev, hashes }, so switching means rewriting the pin's field names and every read of them.
         update-version = pkgs.writeShellApplication {
           name = "update-version";
           text = ''exec ${./update-version.sh} "$@"'';
