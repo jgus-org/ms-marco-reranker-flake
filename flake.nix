@@ -2,23 +2,15 @@
   description = "cross-encoder/ms-marco-MiniLM-L6-v2 reranker model (HuggingFace), pinned by commit + per-file hash for offline loading (no egress).";
 
   inputs = {
+    flake-lib.url = "github:jgus-org/flake-lib/v1";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    flake-lib = {
-      url = "github:jgus-org/flake-lib/v1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
     {
       self,
-      nixpkgs,
       flake-lib,
-      treefmt-nix,
+      nixpkgs,
     }:
     flake-lib.lib.eachDefaultSystem (
       system:
@@ -28,10 +20,8 @@
         inherit (pkgs) lib;
         repo = "cross-encoder/ms-marco-MiniLM-L6-v2";
 
-        treefmtEval = treefmt-nix.lib.evalModule pkgs {
-          projectRootFile = "flake.nix";
-          programs.nixfmt.enable = true;
-          programs.shfmt.enable = true;
+        orgFormatting = flake-lib.lib.mkFormatting {
+          inherit self system;
         };
 
         # Assemble just the needed files into a plain directory CrossEncoder can load by path.
@@ -43,8 +33,8 @@
             lib.mapAttrsToList (file: hash: ''
               cp ${
                 pkgs.fetchurl {
-                  url = "https://huggingface.co/${repo}/resolve/${pin.rev}/${file}";
                   inherit hash;
+                  url = "https://huggingface.co/${repo}/resolve/${pin.rev}/${file}";
                 }
               } "$out/${file}"
             '') pin.hashes
@@ -58,13 +48,12 @@
         };
       in
       {
+        checks.formatting = orgFormatting.check;
+        formatter = orgFormatting.formatter;
         packages = {
           inherit model update-version;
           default = model;
         };
-
-        formatter = treefmtEval.config.build.wrapper;
-        checks.formatting = treefmtEval.config.build.check self;
       }
     );
 }
