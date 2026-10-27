@@ -25,21 +25,30 @@
         };
 
         # Assemble just the needed files into a plain directory CrossEncoder can load by path.
-        model = pkgs.runCommand "ms-marco-MiniLM-L6-v2" { } (
-          ''
-            mkdir -p "$out"
-          ''
-          + lib.concatStrings (
-            lib.mapAttrsToList (file: hash: ''
-              cp ${
-                pkgs.fetchurl {
-                  inherit hash;
-                  url = "https://huggingface.co/${repo}/resolve/${pin.rev}/${file}";
-                }
-              } "$out/${file}"
-            '') pin.hashes
-          )
-        );
+        model =
+          pkgs.runCommand "ms-marco-MiniLM-L6-v2"
+            {
+              meta = {
+                description = "Sentence-transformers cross-encoder re-ranker model files for text ranking";
+                homepage = "https://huggingface.co/${repo}";
+                license = lib.licenses.asl20;
+              };
+            }
+            (
+              ''
+                mkdir -p "$out"
+              ''
+              + lib.concatStrings (
+                lib.mapAttrsToList (file: hash: ''
+                  cp ${
+                    pkgs.fetchurl {
+                      inherit hash;
+                      url = "https://huggingface.co/${repo}/resolve/${pin.rev}/${file}";
+                    }
+                  } "$out/${file}"
+                '') pin.hashes
+              )
+            );
 
         # Bespoke rather than flake-lib's mkUpdateVersion: its huggingface source writes { version, sourceRev, hashes }, and this pin is { rev, hashes }, so switching means rewriting the pin's field names and every read of them.
         update-version = pkgs.writeShellApplication {
