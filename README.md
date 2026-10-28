@@ -43,6 +43,4 @@ scores = model.predict([("Which planet is the Red Planet?", "Mars is the fourth 
 
 Following this flake's `nixpkgs` is safe — what the package contains is fixed by the per-file hashes and does not depend on the package set it is built with.
 
-## License
-
-Apache-2.0, per upstream's model card. The files are re-hosted unchanged, so the flake adds no license grant of its own; the training dataset is [MS MARCO](https://huggingface.co/datasets/sentence-transformers/msmarco).
+See [LICENSE.md](LICENSE.md) for licensing and copyright, and [NOTICE.md](NOTICE.md) for the terms of upstream and distributed artifacts.
