@@ -2,8 +2,11 @@
   description = "cross-encoder/ms-marco-MiniLM-L6-v2 reranker model (HuggingFace), pinned by commit + per-file hash for offline loading (no egress).";
 
   inputs = {
-    flake-lib.url = "github:jgus-org/flake-lib/v1";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    flake-lib = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:jgus-org/flake-lib/v1";
+    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs =
